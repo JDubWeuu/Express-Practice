@@ -35,19 +35,44 @@ app.get('/info', (request, response) => {
     response.send(`<p>Phone book has info for ${data.length}</p><p>${date}</p>`);
 })
 
+const checkID = (id) => {
+    return data.find((entry) => entry.id === id)
+}
+
 app.get('/api/persons/:id',  (request, response) => {
     // use 'params' to access something within the url
     const id = Number(request.params.id);
-    data.map((entry) => {
-        if (entry.id === id) {
-            response.json(entry);
-        }
-    })
+    const res = checkID(id)
+    if (res) {
+        response.json(res)
+    }
     response.status(400).end();
 
+})
+
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    const res = checkID(id)
+
+    if (!res) {
+        response.status(400).end()
+    }
+    // return a new array where the id that's being deleted is filtered out
+    data = data.filter((entry) => {
+        return entry.id !== id
+    })
+    console.log(data)
+    response.status(204).end()
 })
 
 const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
+
+/*
+setCountries((currCountries) => {
+    const newCountry = {id: 1, name:"placeholder", population: 3204005}
+    return [...currCountries, newCountry]
+})
+ */
