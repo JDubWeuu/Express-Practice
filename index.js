@@ -47,7 +47,7 @@ app.get('/api/persons/:id',  (request, response) => {
     if (res) {
         response.json(res)
     }
-    response.status(400).send({"message": "Unable to access specified id; specified id doesn't exist"}).end();
+    response.status(400).send({message: "Unable to access specified id; specified id doesn't exist"}).end();
 
 })
 
@@ -114,6 +114,7 @@ app.post('/api/persons/', (request, response) => {
     response.json(data)
 })
 
+// middleware function, it's called if no routes handle the http requests, meaning the user most likely navigated to an unknown endpoint
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
@@ -126,7 +127,9 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
 
-// middleware function, it's called if no routes handle the http requests, meaning the user most likely navigated to an unknown endpoint
+// middleware is used as a means of handling requests and responses. With post requests, you need a way to handle the request body, and so you utilize a built in json-parser middleware function to do that
+// you can also create your own middleware functions as a means of showing specific data for each route, so then put app.use(...) before your routes
+// you can also use middleware functions after all your routes as a means of shwoing a message for an unknown endpoint
 
 /*
 setCountries((currCountries) => {
