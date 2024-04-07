@@ -114,17 +114,18 @@ app.post('/api/persons/', (request, response) => {
     response.json(data)
 })
 
-const PORT = 3001
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-})
-
-// middleware function, it's called if no routes handle the http requests, meaning the user most likely navigated to an unknown endpoint
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
+
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+})
+
+// middleware function, it's called if no routes handle the http requests, meaning the user most likely navigated to an unknown endpoint
 
 /*
 setCountries((currCountries) => {
