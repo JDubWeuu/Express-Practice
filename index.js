@@ -65,6 +65,33 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 
+function generateRandomID() {
+    let ids = data.map((object) => {
+        return object.id
+    })
+    let id = null
+    do {
+        id = Number(Math.random()*1000)
+    } while(ids.includes(id))
+    console.log(id)
+    return id
+}
+
+app.post('/api/persons', (request, response) => {
+    const body = request.body;
+    console.log(body)
+    if (!body.name && !body.number) {
+        response.status(400).send({message: "missing name and number"})
+    }
+    const template = {
+        "id": generateRandomID(),
+        "name": body.name ? body.name : "",
+        "number": body.number ? body.number : ""
+    }
+    data = [...data, template]
+    response.json(data)
+})
+
 const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
