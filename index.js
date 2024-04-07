@@ -1,27 +1,28 @@
 const express = require('express')
+const morgan = require('morgan')
 
 const app = express();
 
 let data = [
     {
-        "id": 1,
-        "name": "Arto Hellas",
-        "number": "040-123456"
+        id: 1,
+        name: "Arto Hellas",
+        number: "040-123456"
     },
     {
-        "id": 2,
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
+        id: 2,
+        name: "Ada Lovelace",
+        number: "39-44-5323523"
     },
     {
-        "id": 3,
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
+        id: 3,
+        name: "Dan Abramov",
+        number: "12-43-234345"
     },
     {
-        "id": 4,
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
+        id: 4,
+        name: "Mary Poppendieck",
+        number: "39-23-6423122"
     }
 ]
 
@@ -65,23 +66,44 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 
+// need this in order to conduct post request
+app.use(express.json())
+
 function generateRandomID() {
     let ids = data.map((object) => {
         return object.id
     })
     let id = null
     do {
-        id = Number(Math.random()*1000)
+        id = Math.round(Math.random()*1000)
     } while(ids.includes(id))
     console.log(id)
     return id
 }
 
-app.post('/api/persons', (request, response) => {
+morgan.token('req-body', (req) => {
+    // Convert the request body to a JSON string
+    // Be cautious with logging sensitive information
+    return JSON.stringify(req.body);
+});
+
+app.use(morgan(function (tokens, req, res) {
+    return [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms',
+        tokens['req-body'](req, res)
+    ].join(' ')
+}))
+
+app.post('/api/persons/', (request, response) => {
     const body = request.body;
-    console.log(body)
+    const headers = request.headers
+    console.log(request.headers)
     if (!body.name && !body.number) {
-        response.status(400).send({message: "missing name and number"})
+        response.status(400).send({message: "missing name and number"}).end()
     }
     const template = {
         "id": generateRandomID(),
@@ -96,6 +118,13 @@ const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
+
+// middleware function, it's called if no routes handle the http requests, meaning the user most likely navigated to an unknown endpoint
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
 
 /*
 setCountries((currCountries) => {
