@@ -33,7 +33,7 @@ app.get('/', (request, response) => {
 app.get('/info', (request, response) => {
     // obtain the time information for when this get request was made and show it on the screen
     const date = new Date();
-    response.send(`<p>Phone book has info for ${data.length}</p><p>${date}</p>`);
+    response.send(`<p>Phone book has info for ${data.length}</p><p>${date}</p>`).end();
 })
 
 const checkID = (id) => {
@@ -47,7 +47,7 @@ app.get('/api/persons/:id',  (request, response) => {
     if (res) {
         response.json(res)
     }
-    response.status(400).end();
+    response.status(400).send({"message": "Unable to access specified id; specified id doesn't exist"}).end();
 
 })
 
@@ -118,6 +118,7 @@ const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
 
+// if all the other routes aren't satisfied based on the user request, then the app will call the unknownEndpoint function which is middleware
 app.use(unknownEndpoint)
 
 const PORT = process.env.PORT || 3001
